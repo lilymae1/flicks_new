@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "13257878954",
+    "project_id": "online-db-lily",
+    "storage_bucket": "online-db-lily.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13257878954:android:986cb727872a1352c30fd3",
+        "android_client_info": {
+          "package_name": "com.example.flicks_new"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmtzIuLdSL4V4GdeGgn2OlgTN-5_42xpk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13257878954:android:01bcc48d8da610eec30fd3",
+        "android_client_info": {
+          "package_name": "com.example.flicks"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmtzIuLdSL4V4GdeGgn2OlgTN-5_42xpk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13257878954:android:70987dd9c44dc520c30fd3",
+        "android_client_info": {
+          "package_name": "com.example.flicks_new"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmtzIuLdSL4V4GdeGgn2OlgTN-5_42xpk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
