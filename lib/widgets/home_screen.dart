@@ -12,11 +12,14 @@ import '../models/tmdb.dart';
 import 'h_film_card.dart';
 import '../Theme/themeData.dart';
 import '../Theme/colours.dart';
+import 'dart:io';
+
 
 class HomeScreen extends StatefulWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final int initialTabIndex;
   final String? deepLinkSessionId;
+  
 
   const HomeScreen({
     super.key,
@@ -34,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   List<Map<String, dynamic>> _friends = [];
   int? _userID;
   late String _sessionId = '';
+  String? _profilePicturePath;
 
   late TabController _tabController;
 
@@ -70,6 +74,15 @@ Future<void> _loadMatches() async {
   });
 }
 
+Future<void> _loadProfilePicture() async {
+  if (_userID != null) {
+    final path = await DatabaseServices.getProfilePicturePath(_userID!);
+    setState(() {
+      _profilePicturePath = path;
+    });
+  }
+}
+
 
   @override
   void initState() {
@@ -77,6 +90,7 @@ Future<void> _loadMatches() async {
 
     _loadFriends();
     _loadMatches();
+    
     _tabController = TabController(length: _tabs.length, vsync: this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -103,18 +117,23 @@ Future<void> _loadMatches() async {
     });
   }
 
-  Future<void> _loadFriends() async {
-    final prefs = await SharedPreferences.getInstance();
-    int? userID = prefs.getInt('userID');
-    if (userID != null) {
-      List<Map<String, dynamic>> friends = await DatabaseServices.getFriends(userID);
-      setState(() {
-        _userID = userID;
-        _friends = friends;
-      });
-      await NotificationServices.checkPendingNotifications(userID.toString());
-    }
+Future<void> _loadFriends() async {
+  final prefs = await SharedPreferences.getInstance();
+  int? userID = prefs.getInt('userID');
+  if (userID != null) {
+    List<Map<String, dynamic>> friends = await DatabaseServices.getFriends(userID);
+    final path = await DatabaseServices.getProfilePicturePath(userID);
+
+    setState(() {
+      _userID = userID;
+      _friends = friends;
+      _profilePicturePath = path;
+    });
+
+    await NotificationServices.checkPendingNotifications(userID.toString());
   }
+}
+
 
   Future<void> _loadSessionId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -177,6 +196,25 @@ Future<void> _loadMatches() async {
                   style: FlicksTheme.pageHeader(),
                 ),
                 const SizedBox(height: 20),
+                Center(
+  child: ClipOval(
+    child: _profilePicturePath != null && File(_profilePicturePath!).existsSync()
+        ? Image.file(
+            File(_profilePicturePath!),
+            width: 100,
+            height: 100,
+            fit: BoxFit.cover,
+          )
+        : Image.asset(
+            'assets/default_profile.png', // Default fallback
+            width: 100,
+            height: 100,
+            fit: BoxFit.cover,
+          ),
+  ),
+),
+const SizedBox(height: 20),
+
                 const Text(
                   'Your Friends',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -185,7 +223,7 @@ Future<void> _loadMatches() async {
                 SizedBox(
                 height: 100,
                 child: _friends.isEmpty
-                ? const Text("You haven't added any friends yet.")
+                ? const Text("You haven't added any friends yet.",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),)
                 : ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: _friends.length,
@@ -247,12 +285,12 @@ Future<void> _loadMatches() async {
                 const Text('Matched Movies', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 if (_matchedMovies.isEmpty)
-                  const Text("You haven't matched any movies yet."),
+                  const Text("You haven't matched any movies yet.",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
                 ..._matchedMovies.map((movie) {
                   return FilmCard_H(
                     title: movie.movieTitle,
                     plot: movie.moviePlot,
-                    posterUrl: movie.posterPath ?? '',
+                    posterUrl: movie.posterPath,
                   );
                 }).toList(),
               ],

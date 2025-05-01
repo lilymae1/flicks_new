@@ -8,7 +8,6 @@ import '../services/DatabaseServices.dart';
 import '../services/FirebaseServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../services/NotificationServices.dart';
 import '../Theme/themeData.dart';
 
 class NewSwipe extends StatefulWidget {
@@ -183,7 +182,7 @@ Future<void> loadSession() async {
                       items: _friendMap.entries
                           .map((entry) => DropdownMenuItem<int>(
                                 value: entry.key,
-                                child: Text(entry.value),
+                                child: Text(entry.value,style: TextStyle(fontSize: 21,fontWeight: FontWeight.bold)),
                               ))
                           .toList(),
                       onChanged: (friendID) {
@@ -205,7 +204,7 @@ Future<void> loadSession() async {
                             items: genres.entries
                                 .map((entry) => DropdownMenuItem<int>(
                                       value: entry.key,
-                                      child: Text(entry.value),
+                                      child: Text(entry.value,style: TextStyle(fontSize: 21,fontWeight: FontWeight.bold)),
                                     ))
                                 .toList(),
                             onChanged: (genreId) async {

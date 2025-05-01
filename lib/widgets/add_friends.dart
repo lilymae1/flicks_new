@@ -3,7 +3,6 @@ import 'package:flicks_new/Theme/themeData.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/DatabaseServices.dart';
-import '../Theme/themeData.dart';
 
 
 class AddFriends extends StatefulWidget {

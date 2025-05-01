@@ -42,14 +42,6 @@ class MatchDetailsPage extends StatelessWidget {
     );
   }
 
-  Future<void> _displayMatch(BuildContext context) async {
-    final movie = await MovieFunctions.fetchMovieById(movieId);
-    String title = movie?.movieTitle ?? '';
-    String plot = movie?.moviePlot ?? '';
-    String posterUrl = movie?.posterPath ?? '';
-    FilmCard(title: title, plot: plot, posterUrl: posterUrl); 
-  }
-
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,15 +70,10 @@ class MatchDetailsPage extends StatelessWidget {
                   FilmCard(
                     title: movie.movieTitle,
                     plot: movie.moviePlot,
-                    posterUrl: movie.posterPath ?? '',
+                    posterUrl: movie.posterPath,
                   )
                 else
                   const Text("Failed to load movie info."),
-                const SizedBox(height: 20),
-                Text('Session ID: $sessionId', style: const TextStyle(fontSize: 18)),
-                const SizedBox(height: 10),
-                Text('Movie ID: $movieId', style: const TextStyle(fontSize: 18)),
-                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () => _addMatch(context),
                   child: const Text("Save Match & Go Home"),

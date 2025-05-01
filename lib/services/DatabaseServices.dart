@@ -3,65 +3,94 @@ import 'package:path/path.dart';
 
 class DatabaseServices {
 
- static Future<Database> _openDatabase() async {
-  final database_path = await getDatabasesPath();
-  final database_file = join(database_path, "users.db");
+  static Future<Database> _openDatabase() async {
+    final database_path = await getDatabasesPath();
+    final database_file = join(database_path, "users.db");
 
-  final db = await openDatabase(database_file,version: 1,onCreate: createDatabase,);
-  await db.execute("PRAGMA foreign_keys = ON");
+    final db = await openDatabase(database_file, version: 1, onCreate: createDatabase);
+    await db.execute("PRAGMA foreign_keys = ON");
 
-  return db;
-}
-
-  static Future<void> createDatabase(Database db, int version) async {
-    await db.execute('''CREATE TABLE IF NOT EXISTS users (userID INTEGER PRIMARY KEY AUTOINCREMENT,userName TEXT,email TEXT,mobileNo INTEGER,password TEXT)''');
-    await db.execute('''CREATE TABLE IF NOT EXISTS friends (connectionid INTEGER PRIMARY KEY AUTOINCREMENT,userID INTEGER,friendID INTEGER,UNIQUE(userID, friendID),FOREIGN KEY(userID) REFERENCES users(userID),FOREIGN KEY(friendID) REFERENCES users(userID))''');
-    await db.execute('''CREATE TABLE IF NOT EXISTS matches (matchID INTEGER PRIMARY KEY AUTOINCREMENT,userID INTEGER,movieID TEXT,matched_at TEXT,FOREIGN KEY(userID) REFERENCES users(userID))''');
+    return db;
   }
 
-  //user functions 
+  static Future<void> createDatabase(Database db, int version) async {
+    await db.execute('''CREATE TABLE IF NOT EXISTS users (
+      userID INTEGER PRIMARY KEY AUTOINCREMENT,
+      userName TEXT,
+      email TEXT,
+      mobileNo INTEGER,
+      password TEXT
+    )''');
+
+    await db.execute('''CREATE TABLE IF NOT EXISTS friends (
+      connectionid INTEGER PRIMARY KEY AUTOINCREMENT,
+      userID INTEGER,
+      friendID INTEGER,
+      UNIQUE(userID, friendID),
+      FOREIGN KEY(userID) REFERENCES users(userID),
+      FOREIGN KEY(friendID) REFERENCES users(userID)
+    )''');
+
+    await db.execute('''CREATE TABLE IF NOT EXISTS matches (
+      matchID INTEGER PRIMARY KEY AUTOINCREMENT,
+      userID INTEGER,
+      movieID TEXT,
+      matched_at TEXT,
+      FOREIGN KEY(userID) REFERENCES users(userID)
+    )''');
+
+    // Creating the user_profile_pictures table to store profile pictures
+    await db.execute('''CREATE TABLE IF NOT EXISTS user_profile_pictures (
+      propicID INTEGER PRIMARY KEY AUTOINCREMENT,
+      userID INTEGER NOT NULL,
+      profile_picture_path TEXT NOT NULL,
+      FOREIGN KEY(userID) REFERENCES users(userID) ON DELETE CASCADE
+    )''');
+  }
+
+  // User functions
   static Future<int> addUserDetails(String name, String email, int mobileNo, String password) async {
     final db = await _openDatabase();
 
     Map<String, dynamic> userRecord = {
       'userName': name,
-      'email' : email,
-      'mobileNo' : mobileNo,
-      'password' : password
+      'email': email,
+      'mobileNo': mobileNo,
+      'password': password
     };
+
     return await db.insert('users', userRecord);
   }
 
-  static Future<Map<String, dynamic>?> retrieveSingleRecord(int uID)async {
+  static Future<Map<String, dynamic>?> retrieveSingleRecord(int uID) async {
     final db = await _openDatabase();
-    List<Map<String,dynamic>> result = await db.query('users', where : 'userID =?', whereArgs: [uID],limit: 1);
+    List<Map<String, dynamic>> result = await db.query('users', where: 'userID =?', whereArgs: [uID], limit: 1);
 
     return result.isNotEmpty ? result.first : null;
   }
 
-  static Future<int> updateStudentRecord(int uID, Map<String,dynamic> record) async{
+  static Future<int> updateStudentRecord(int uID, Map<String, dynamic> record) async {
     final db = await _openDatabase();
-    return await db.update('users', record, where: 'userID=?',whereArgs: [uID]);
+    return await db.update('users', record, where: 'userID=?', whereArgs: [uID]);
   }
-  
+
   static Future<List<Map<String, dynamic>>> getAllStudentRecords() async {
     final db = await _openDatabase();
     return await db.query('users');
   }
 
-  Future<Map<String, dynamic>?> getUserByUsername(String username) async {//gets user name from input on login screen
+  Future<Map<String, dynamic>?> getUserByUsername(String username) async {
     final db = await _openDatabase();
-    final result = await db.query('users',where: 'userName = ?',whereArgs: [username],
-  );
+    final result = await db.query('users', where: 'userName = ?', whereArgs: [username]);
 
     return result.isNotEmpty ? result.first : null;
   }
 
-//functions for friends   
- static Future<void> addFriend(int userID, int friendID) async {
-  final db = await _openDatabase();
+  // Functions for friends   
+  static Future<void> addFriend(int userID, int friendID) async {
+    final db = await _openDatabase();
 
-      await db.insert('friends', {
+    await db.insert('friends', {
       'userID': userID,
       'friendID': friendID,
     }, conflictAlgorithm: ConflictAlgorithm.ignore);
@@ -70,18 +99,16 @@ class DatabaseServices {
       'userID': friendID,
       'friendID': userID,
     }, conflictAlgorithm: ConflictAlgorithm.ignore);
-}
+  }
 
-
-static Future<List<Map<String, dynamic>>> getFriends(int userID) async {
-  final db = await _openDatabase();
-  return await db.rawQuery('''
-    SELECT DISTINCT users.* FROM users
-    INNER JOIN friends ON users.userID = friends.friendID
-    WHERE friends.userID = ?
-  ''', [userID]);
-}
-
+  static Future<List<Map<String, dynamic>>> getFriends(int userID) async {
+    final db = await _openDatabase();
+    return await db.rawQuery('''
+      SELECT DISTINCT users.* FROM users
+      INNER JOIN friends ON users.userID = friends.friendID
+      WHERE friends.userID = ?
+    ''', [userID]);
+  }
 
   static Future<void> deleteFriend(int uID, int friendID) async {
     final db = await _openDatabase();
@@ -92,47 +119,88 @@ static Future<List<Map<String, dynamic>>> getFriends(int userID) async {
     );
   }
 
-  static Future<Map<String, dynamic>?> searchUserByUsername(String username, int currentUserId) async { //for the find friend page 
-  final db = await _openDatabase();
-  final result = await db.query(
-    'users',
-    where: 'userName = ? AND userID != ?',
-    whereArgs: [username, currentUserId],
-    limit: 1,
-  );
+  static Future<Map<String, dynamic>?> searchUserByUsername(String username, int currentUserId) async {
+    final db = await _openDatabase();
+    final result = await db.query(
+      'users',
+      where: 'userName = ? AND userID != ?',
+      whereArgs: [username, currentUserId],
+      limit: 1,
+    );
 
-  return result.isNotEmpty ? result.first : null;
+    return result.isNotEmpty ? result.first : null;
   }
 
   static Future<bool> CheckIfAlreadyFreinds(int userID, int otherUserID) async {
     final db = await _openDatabase();
 
-     final result = await db.query(
-    'friends',
-    where: 'userID = ? AND friendID = ?',
-    whereArgs: [userID, otherUserID],
-    limit: 1,
-  );
+    final result = await db.query(
+      'friends',
+      where: 'userID = ? AND friendID = ?',
+      whereArgs: [userID, otherUserID],
+      limit: 1,
+    );
 
-  return result.isNotEmpty;
+    return result.isNotEmpty;
   }
 
-
+  // Matches
   static Future<List<Map<String, dynamic>>> displayMatches() async {
     final db = await _openDatabase();
     return await db.query('matches');
   }
 
-static Future<void> saveMatch(String movie,int user,String time) async {
-  final db = await _openDatabase();
-      Map<String, dynamic> match_details = {
+  static Future<void> saveMatch(String movie, int user, String time) async {
+    final db = await _openDatabase();
+    Map<String, dynamic> match_details = {
       'movieID': movie,
-      'userID':user,
-      'matched_at' : time,
+      'userID': user,
+      'matched_at': time,
     };
     await db.insert('matches', match_details);
+  }
 
+  // Profile picture
+  static Future<void> addOrUpdateProfilePicture(int userID, String picturePath) async {
+    final db = await _openDatabase();
+    final existingPic = await db.query(
+      'user_profile_pictures',
+      where: 'userID = ?',
+      whereArgs: [userID],
+    );
+
+    if (existingPic.isNotEmpty) {
+      // If the user already has a profile picture, update it
+      await db.update(
+        'user_profile_pictures',
+        {'profile_picture_path': picturePath},
+        where: 'userID = ?',
+        whereArgs: [userID],
+      );
+    } else {
+      // Otherwise, insert a new profile picture
+      await db.insert(
+        'user_profile_pictures',
+        {'userID': userID, 'profile_picture_path': picturePath},
+      );
+    }
+  }
+
+  static Future<String?> getProfilePicturePath(int userID) async {
+    final db = await _openDatabase();
+
+    final result = await db.query(
+      'user_profile_pictures',
+      where: 'userID = ?',
+      whereArgs: [userID],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first['profile_picture_path'] as String?;
+    }
+
+    return null; // If no profile picture exists
+  }
 }
 
-}
 

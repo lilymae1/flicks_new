@@ -5,8 +5,6 @@ import 'widgets/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/NotificationServices.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'widgets/match_details.dart';
-import 'services/notification_callback.dart';
 import 'Theme/themeData.dart';
 
 // Global navigator key
