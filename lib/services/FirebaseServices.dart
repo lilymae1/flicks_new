@@ -1,6 +1,6 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'NotificationServices.dart';
+import 'DatabaseServices.dart';
 
 
 Future <void> swipeRequest({required String fromuserID,required String toUserID, required String sessionID,}) async {
@@ -51,20 +51,22 @@ Future<void> storeSwipe({required String sessionID,required String userID,requir
   }
 }
 
-Future<void> movieMatch({required String sessionID,required String currentUserID,required String movieID,required bool liked,}) async {
-  if (!liked) return; // Only care about "likes"
+Future<void> movieMatch({
+  required String sessionID,
+  required String currentUserID,
+  required String otherUserID, // Make otherUserID a required parameter
+  required String movieID,
+  required bool liked,
+}) async {
+  if (!liked) return; 
 
   try {
+    // Fetch session data
     final sessionDoc = await FirebaseFirestore.instance.collection('sessions').doc(sessionID).get();
     final sessionData = sessionDoc.data();
     if (sessionData == null) return;
 
-    // Determine other user
-    final userA = sessionData['userA'];
-    final userB = sessionData['userB'];
-    final otherUserID = (currentUserID == userA) ? userB : userA;
-
-    // Get other user's swipes
+    // Fetch the other user's swipe data
     final otherUserSwipeRef = FirebaseFirestore.instance
         .collection('sessions')
         .doc(sessionID)
@@ -78,18 +80,28 @@ Future<void> movieMatch({required String sessionID,required String currentUserID
     if (otherSwipes != null && otherSwipes[movieID] == true) {
       final sessionRef = FirebaseFirestore.instance.collection('sessions').doc(sessionID);
 
+      // Update session with the matched movie ID
       await sessionRef.update({
         'matches': FieldValue.arrayUnion([movieID])
       });
 
-      // Optionally send match notification
-      NotificationServices.sendMatchNotification(sessionID, otherUserID, movieID,currentUserID);
+      String timestamp = DateTime.now().toIso8601String();
+
+      // Save the match for both users (currentUser and the other user)
+      await DatabaseServices.saveMatch(movieID, currentUserID, timestamp);
+      await DatabaseServices.saveMatch(movieID, otherUserID, timestamp);
+
+      // Send a notification to the other user
+      NotificationServices.sendMatchNotification(
+        sessionID, otherUserID, movieID, currentUserID,
+      );
     }
   } catch (e) {
     print("Error checking for movie match: $e");
   }
-
 }
+
+
 
   Future<Map<String, dynamic>?> getSessionById(String sessionId) async {
   try {

@@ -43,67 +43,67 @@ class _SwipeScreenState extends State<NewSwipe> {
     loadFriends();
   }
 
-Future<void> loadSession() async {
-  final prefs = await SharedPreferences.getInstance();
-  final sessionId = widget.sessionId;  // Use sessionId passed via the constructor
+  Future<void> loadSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    final sessionId = widget.sessionId;
 
-  if (sessionId.isNotEmpty) {
-    final savedIndex = prefs.getInt('swipe_index_$sessionId') ?? 0;
-
-    setState(() {
-      _sessionId = sessionId;
-      _savedSwipeIndex = savedIndex;
-    });
-
-    try {
-      final sessionDoc = await FirebaseFirestore.instance
-          .collection('sessions')
-          .doc(sessionId)
-          .get();
-
-      if (!sessionDoc.exists) throw Exception('Session document not found');
-
-      final data = sessionDoc.data();
-      final movieIds = List<String>.from(data?['movies'] ?? []);
-      if (movieIds.isEmpty) throw Exception('No movies in session');
-
-      final movies = await MovieFunctions.fetchMoviesByIds(movieIds);
-
-      final remainingMovies = _savedSwipeIndex < movies.length ? movies.sublist(_savedSwipeIndex).cast<Movie>() : <Movie>[];
+    if (sessionId.isNotEmpty) {
+      final savedIndex = prefs.getInt('swipe_index_$sessionId') ?? 0;
 
       setState(() {
-        _selectedMovies = remainingMovies;
-        _showForm = false;
+        _sessionId = sessionId;
+        _savedSwipeIndex = savedIndex;
       });
 
-      print("Loaded ${remainingMovies.length} movies from session, starting at index $_savedSwipeIndex");
-    } catch (e) {
-      print("Invalid session or failed to load: $e");
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('session_id');
-      setState(() {
-        _showForm = true;
-        _sessionId = '';
-        _selectedMovies = [];
-      });
+      try {
+        final sessionDoc = await FirebaseFirestore.instance
+            .collection('sessions')
+            .doc(sessionId)
+            .get();
+
+        if (!sessionDoc.exists) throw Exception('Session document not found');
+
+        final data = sessionDoc.data();
+        final movieIds = List<String>.from(data?['movies'] ?? []);
+        if (movieIds.isEmpty) throw Exception('No movies in session');
+
+        final movies = await MovieFunctions.fetchMoviesByIds(movieIds);
+        final remainingMovies = _savedSwipeIndex < movies.length
+            ? movies.sublist(_savedSwipeIndex).cast<Movie>()
+            : <Movie>[];
+
+        setState(() {
+          _selectedMovies = remainingMovies;
+          _showForm = false;
+        });
+
+        print("Loaded ${remainingMovies.length} movies from session, starting at index $_savedSwipeIndex");
+      } catch (e) {
+        print("Invalid session or failed to load: $e");
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('session_id');
+        setState(() {
+          _showForm = true;
+          _sessionId = '';
+          _selectedMovies = [];
+        });
+      }
     }
   }
-}
-
 
   Future<void> resetSession() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.remove('session_id');
-  await prefs.remove('swipe_index_$_sessionId');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('session_id');
+    await prefs.remove('swipe_index_$_sessionId');
 
-  setState(() {
-    _sessionId = '';
-    _savedSwipeIndex = 0;
-    _selectedMovies = [];
-    _showForm = true;
-  });
+    setState(() {
+      _sessionId = '';
+      _savedSwipeIndex = 0;
+      _selectedMovies = [];
+      _showForm = true;
+    });
 
-  print("Session has been reset.");
+    print("Session has been reset.");
   }
 
   Future<void> loadGenres() async {
@@ -140,7 +140,7 @@ Future<void> loadSession() async {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('session_id', sessionId);
-    await prefs.setInt('swipe_index_$sessionId', 0); // Start from 0
+    await prefs.setInt('swipe_index_$sessionId', 0);
 
     setState(() {
       _sessionId = sessionId;
@@ -151,14 +151,13 @@ Future<void> loadSession() async {
     print("Session created and stored: $_sessionId");
   }
 
-  int _currentIndex = 0; // Track the current movie index
-  
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("New swipe",style: FlicksTheme.pageHeader()),
+        title: Text("New swipe", style: FlicksTheme.pageHeader()),
         actions: [
           if (!_showForm)
             IconButton(
@@ -173,23 +172,26 @@ Future<void> loadSession() async {
             ? Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
                     child: DropdownButtonFormField<int>(
                       decoration: InputDecoration(
-                      labelText: "Who would you like to swipe with?",
-                      prefixIcon: Icon(Icons.group),
+                        labelText: "Who would you like to swipe with?",
+                        prefixIcon: Icon(Icons.group),
                       ),
                       items: _friendMap.entries
                           .map((entry) => DropdownMenuItem<int>(
                                 value: entry.key,
-                                child: Text(entry.value,style: TextStyle(fontSize: 21,fontWeight: FontWeight.bold)),
+                                child: Text(entry.value,
+                                    style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
                               ))
                           .toList(),
                       onChanged: (friendID) {
-                        setState(() {
-                          _selectedFriendId = friendID;
-                        });
-                      },
+  setState(() {
+    _selectedFriendId = friendID; // Updating the selected friend's ID
+  });
+  print("Selected Friend ID: $_selectedFriendId"); // Debugging print
+},
+
                     ),
                   ),
                   Padding(
@@ -198,13 +200,14 @@ Future<void> loadSession() async {
                         ? CircularProgressIndicator()
                         : DropdownButtonFormField<int>(
                             decoration: InputDecoration(
-                            labelText: "Pick a genre",
-                            prefixIcon: Icon(Icons.theater_comedy),
+                              labelText: "Pick a genre",
+                              prefixIcon: Icon(Icons.theater_comedy),
                             ),
                             items: genres.entries
                                 .map((entry) => DropdownMenuItem<int>(
                                       value: entry.key,
-                                      child: Text(entry.value,style: TextStyle(fontSize: 21,fontWeight: FontWeight.bold)),
+                                      child: Text(entry.value,
+                                          style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
                                     ))
                                 .toList(),
                             onChanged: (genreId) async {
@@ -218,16 +221,16 @@ Future<void> loadSession() async {
                           ),
                   ),
                   ElevatedButton(
-                  onPressed: startSwipe,
-                  child: Row(
-                  mainAxisSize: MainAxisSize.min, // Keep the button tight around content
-                  children: const [
-                  Icon(Icons.swipe,color: FlicksColours.Yellow, size: 20), // You can use Icons.edit or Icons.refresh as alternatives
-                  SizedBox(width: 8), // Spacing between icon and text
-                  Text('Start swipe'),
-                    ],
+                    onPressed: startSwipe,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.swipe, color: FlicksColours.Yellow, size: 20),
+                        SizedBox(width: 8),
+                        Text('Start swipe'),
+                      ],
+                    ),
                   ),
-                ),
                 ],
               )
             : _selectedMovies.isEmpty
@@ -246,17 +249,22 @@ Future<void> loadSession() async {
                       MediaQuery.of(context).size.height * 0.6,
                     ),
                     onForward: (index, info) async {
-                      // Manually manage the index
                       final swipedMovie = _selectedMovies[_currentIndex];
 
-                      // Log the movie and index
                       print("Swiping movie: ${swipedMovie.movieTitle}, index: $_currentIndex");
 
-                      // Save the swipe index after each swipe
                       final prefs = await SharedPreferences.getInstance();
                       await prefs.setInt('swipe_index_$_sessionId', _currentIndex + 1);
 
-                      // Handle the movie swiping logic
+                      // Ensure `otherUserID` is selected before calling `movieMatch`
+                      if (_selectedFriendId == null) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text("Please select a friend before swiping."))
+  );
+  return;
+}
+
+
                       if (info.direction == SwipDirection.Right) {
                         storeSwipe(
                           sessionID: _sessionId,
@@ -264,12 +272,16 @@ Future<void> loadSession() async {
                           movieID: swipedMovie.movieID.toString(),
                           liked: true,
                         );
+
+                        // Pass selected friend ID as `otherUserID`
                         movieMatch(
                           sessionID: _sessionId,
                           currentUserID: currentUserId.toString(),
+                          otherUserID: _selectedFriendId.toString(),  // Use _selectedFriendId here
                           movieID: swipedMovie.movieID.toString(),
                           liked: true,
                         );
+
                         likedMovies.add(swipedMovie);
                         print("Liked movie: ${swipedMovie.movieTitle}");
                       } else if (info.direction == SwipDirection.Left) {
@@ -283,12 +295,10 @@ Future<void> loadSession() async {
                         print("Disliked movie: ${swipedMovie.movieTitle}");
                       }
 
-                      // Update the index manually
                       setState(() {
                         _currentIndex++;
                       });
 
-                      // Ensure that we don't go beyond the available movie list
                       if (_currentIndex >= _selectedMovies.length) {
                         print("All cards swiped!");
                         print("Liked movies: ${likedMovies.map((m) => m.movieTitle)}");
@@ -304,7 +314,5 @@ Future<void> loadSession() async {
       ),
     );
   }
-
-
-
 }
+

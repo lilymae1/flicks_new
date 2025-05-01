@@ -22,7 +22,7 @@ class _accountScreenState extends State<CreateAccount> {
   final _emailController = TextEditingController();
   final _mobileController = TextEditingController();
   final _passwordController = TextEditingController();
-  String? _profilePicturePath; // Variable to hold the profile picture path
+  String? _profilePicturePath; 
 
   // Request permissions for camera and gallery
   Future<void> _requestPermissions() async {
@@ -36,14 +36,14 @@ class _accountScreenState extends State<CreateAccount> {
   // Pick Image function
   Future<void> _pickImage(ImageSource source) async {
     try {
-      await _requestPermissions(); // Request necessary permissions
+      await _requestPermissions(); 
 
       final ImagePicker _picker = ImagePicker();
       final XFile? image = await _picker.pickImage(
         source: source,
         maxWidth: 600,       // Resize image to reduce memory usage
         maxHeight: 600,
-        imageQuality: 75,    // Compress quality (0-100, where 100 is original)
+        imageQuality: 75,    
       );
 
       if (image != null && await File(image.path).exists()) {
@@ -148,7 +148,7 @@ class _accountScreenState extends State<CreateAccount> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  // Show bottom sheet to choose between camera and gallery
+                  
                   showModalBottomSheet(
                     context: context,
                     builder: (context) {
@@ -183,7 +183,7 @@ class _accountScreenState extends State<CreateAccount> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+                  width: MediaQuery.of(context).size.width * 0.8, 
                   child: TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(
@@ -201,7 +201,7 @@ class _accountScreenState extends State<CreateAccount> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+                  width: MediaQuery.of(context).size.width * 0.8, 
                   child: TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
@@ -219,7 +219,7 @@ class _accountScreenState extends State<CreateAccount> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+                  width: MediaQuery.of(context).size.width * 0.8, 
                   child: TextFormField(
                     controller: _mobileController,
                     keyboardType: TextInputType.number,
@@ -238,7 +238,7 @@ class _accountScreenState extends State<CreateAccount> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+                  width: MediaQuery.of(context).size.width * 0.8, 
                   child: TextFormField(
                     controller: _passwordController,
                     obscureText: true,

@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import '../Theme/themeData.dart';
 import 'create_account.dart';
-import '../services/DatabaseServices.dart'; // Import your DB functions
+import '../services/DatabaseServices.dart'; 
 import 'debug_db_viewer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Theme/themeData.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,12 +39,14 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user != null && user['password'] == password) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('username', username); // Save login details
+        await prefs.setString('username', username); 
         await prefs.setInt('userID', user['userID']);
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen(navigatorKey: navigatorKey)),
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(navigatorKey: navigatorKey),
+          ),
         );
       } else {
         _showDialog("Incorrect username or password.");
@@ -67,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text("OK"),
-          )
+          ),
         ],
       ),
     );
@@ -77,15 +78,15 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true, // Centers the AppBar title horizontally
+        centerTitle: true,
         title: Text(
           "Flicks",
           style: FlicksTheme.pageHeader(),
         ),
       ),
       body: SafeArea(
-        child: Center( // Center vertically and horizontally
-          child: SingleChildScrollView( // Allows scrolling on smaller screens
+        child: Center(
+          child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -120,7 +121,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 125,
                           child: ElevatedButton.icon(
                             onPressed: _loginUser,
-                            icon: const Icon(Icons.login, color: FlicksColours.Yellow, size: 20),
+                            icon: const Icon(
+                              Icons.login,
+                              color: FlicksColours.Yellow,
+                              size: 20,
+                            ),
                             label: const Text("Login"),
                             style: ElevatedButton.styleFrom(
                               minimumSize: const Size(125, 40),
@@ -134,10 +139,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const CreateAccount()),
+                          MaterialPageRoute(
+                            builder: (context) => const CreateAccount(),
+                          ),
                         );
                       },
-                      icon: const Icon(Icons.person, color: FlicksColours.Yellow, size: 20),
+                      icon: const Icon(
+                        Icons.person,
+                        color: FlicksColours.Yellow,
+                        size: 20,
+                      ),
                       label: const Text("Create account"),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(125, 40),
@@ -145,22 +156,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  SizedBox(
-                    width: 125,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const DebugDBViewer()),
-                        );
-                      },
-                      icon: const Icon(Icons.bug_report),
-                      label: const Text("Debug DB Viewer"),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(125, 40),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -170,4 +165,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 

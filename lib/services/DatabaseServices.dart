@@ -150,7 +150,7 @@ class DatabaseServices {
     return await db.query('matches');
   }
 
-  static Future<void> saveMatch(String movie, int user, String time) async {
+  static Future<void> saveMatch(String movie, String user, String time) async {
     final db = await _openDatabase();
     Map<String, dynamic> match_details = {
       'movieID': movie,
@@ -159,8 +159,7 @@ class DatabaseServices {
     };
     await db.insert('matches', match_details);
   }
-
-  // Profile picture
+  //Profile picture
   static Future<void> addOrUpdateProfilePicture(int userID, String picturePath) async {
     final db = await _openDatabase();
     final existingPic = await db.query(
@@ -170,7 +169,6 @@ class DatabaseServices {
     );
 
     if (existingPic.isNotEmpty) {
-      // If the user already has a profile picture, update it
       await db.update(
         'user_profile_pictures',
         {'profile_picture_path': picturePath},
@@ -178,7 +176,6 @@ class DatabaseServices {
         whereArgs: [userID],
       );
     } else {
-      // Otherwise, insert a new profile picture
       await db.insert(
         'user_profile_pictures',
         {'userID': userID, 'profile_picture_path': picturePath},
@@ -199,7 +196,7 @@ class DatabaseServices {
       return result.first['profile_picture_path'] as String?;
     }
 
-    return null; // If no profile picture exists
+    return null; 
   }
 }
 

@@ -44,17 +44,17 @@ class FlicksTheme {
         ),
       ),
 
-      // ✅ Custom ElevatedButton style
+      
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.black, // Text color
-          backgroundColor: FlicksColours.Grey, // You can change this if you want a filled color
+          foregroundColor: Colors.black, 
+          backgroundColor: FlicksColours.Grey, 
           side: const BorderSide(color: FlicksColours.Black, width: 2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle( fontSize: 20),
-          elevation: 0, // Optional: flat look
+          elevation: 0, 
         ),
       ),
 

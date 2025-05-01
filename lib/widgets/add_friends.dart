@@ -105,10 +105,10 @@ Widget build(BuildContext context) {
             ElevatedButton(
                   onPressed: _friendSearch,
                   child: Row(
-                  mainAxisSize: MainAxisSize.min, // Keep the button tight around content
+                  mainAxisSize: MainAxisSize.min, 
                   children: const [
-                  Icon(Icons.search ,color: FlicksColours.Yellow, size: 20), // You can use Icons.edit or Icons.refresh as alternatives
-                  SizedBox(width: 8), // Spacing between icon and text
+                  Icon(Icons.search ,color: FlicksColours.Yellow, size: 20), 
+                  SizedBox(width: 8), 
                   Text('Search'),
                     ],
                   ),
@@ -129,7 +129,7 @@ Widget build(BuildContext context) {
                 ),
               ),
 
-            // Message (no user found, success, etc.)
+            // Message 
             if (_message.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),

@@ -10,7 +10,7 @@ import 'Theme/themeData.dart';
 // Global navigator key
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-// Store latest action to be handled when app is in foreground
+
 ReceivedAction? pendingAction;
 
 void main() async {
@@ -28,9 +28,9 @@ void main() async {
   await NotificationServices.requestPermission();
 
 
-  // Register top-level/global listeners
+  
   AwesomeNotifications().setListeners(
-    onActionReceivedMethod: onActionReceivedMethod, // <-- FIXED
+    onActionReceivedMethod: onActionReceivedMethod, 
     onNotificationCreatedMethod: handleNotificationCreated,
     onNotificationDisplayedMethod: handleNotificationDisplayed,
     onDismissActionReceivedMethod: handleDismissAction,
@@ -42,15 +42,13 @@ void main() async {
   ));
 }
 
-// ------------------------------
-// Top-level background-safe methods
-// ------------------------------
+
 
 Future<void> onActionReceivedMethod(ReceivedAction action) async {
   print('[Top-Level] Notification action received: ${action.buttonKeyPressed}');
   pendingAction = action;
 
-  // Optional: Handle immediately if app is in foreground
+ 
   if (navigatorKey.currentState != null) {
     await NotificationServices.handleNotificationAction(action, navigatorKey);
   }
@@ -68,9 +66,7 @@ Future<void> handleDismissAction(ReceivedAction action) async {
   print('Notification dismissed: ${action.payload}');
 }
 
-// ------------------------------
-// Main App
-// ------------------------------
+
 
 class filmSwiper extends StatefulWidget {
   final bool isLoggedIn;
@@ -96,7 +92,7 @@ class _filmSwiperState extends State<filmSwiper> {
   void _checkPendingAction() {
     if (pendingAction != null) {
       NotificationServices.handleNotificationAction(pendingAction!, widget.navigatorKey);
-      pendingAction = null; // Clear after handling
+      pendingAction = null; 
     }
   }
 

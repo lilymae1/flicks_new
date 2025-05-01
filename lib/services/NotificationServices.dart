@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import '../widgets/new_swipe.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/match_details.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import '../widgets/home_screen.dart';
 
 class NotificationServices {
+
   // Initialize notifications
   static Future<void> initialize() async {
     AwesomeNotifications().initialize(
@@ -38,7 +36,7 @@ class NotificationServices {
 
   // Send and store session invitation
   static Future<void> sendSessionInvitation(String sessionID, String toUserID) async {
-    // Store the notification in Firestore
+  
     await FirebaseFirestore.instance
         .collection('users')
         .doc(toUserID)
@@ -50,7 +48,7 @@ class NotificationServices {
       'read': false,
     });
 
-    // Optionally: Show local notification (for same device)
+    
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
@@ -72,9 +70,8 @@ class NotificationServices {
     );
   }
 
-  // Send match notification and store
   static Future<void> sendMatchNotification(String sessionId, String otherUserName, String movieId, String toUserID) async {
-    // Store in Firestore
+    
     await FirebaseFirestore.instance
         .collection('users')
         .doc(toUserID)
@@ -170,7 +167,7 @@ class NotificationServices {
         );
       }
 
-      // Mark as read
+      
       await doc.reference.update({'read': true});
     }
   }
@@ -195,12 +192,12 @@ class NotificationServices {
 
   if (action.buttonKeyPressed == 'JOIN') {
     if (sessionId.isNotEmpty) {
-      // Replace current route stack and open HomeScreen with correct tab
+      
       navigatorKey.currentState?.pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => HomeScreen(
             navigatorKey: navigatorKey,
-            initialTabIndex: 2, // Tab index for "Start swiping"
+            initialTabIndex: 2, 
             deepLinkSessionId: sessionId,
           ),
         ),
