@@ -116,17 +116,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   _isLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : Container(
-                          width: 125, // Set a fixed width for the login button
+                      : SizedBox(
+                          width: 125,
                           child: ElevatedButton.icon(
                             onPressed: _loginUser,
                             icon: const Icon(Icons.login, color: FlicksColours.Yellow, size: 20),
                             label: const Text("Login"),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(125, 40),
+                            ),
                           ),
                         ),
                   const SizedBox(height: 10),
-                  Container(
-                    width: 125, // Set a fixed width for the create account button
+                  SizedBox(
+                    width: 125,
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.push(
@@ -136,11 +139,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       icon: const Icon(Icons.person, color: FlicksColours.Yellow, size: 20),
                       label: const Text("Create account"),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(125, 40),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Container(
-                    width: 125, // Set a fixed width for the debug button
+                  SizedBox(
+                    width: 125,
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.push(
@@ -150,6 +156,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       icon: const Icon(Icons.bug_report),
                       label: const Text("Debug DB Viewer"),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(125, 40),
+                      ),
                     ),
                   ),
                 ],
@@ -161,3 +170,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
