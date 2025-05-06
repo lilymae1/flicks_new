@@ -47,7 +47,7 @@ void main() {
     });
 
     test('can save and retrieve matches', () async {
-      await DatabaseServices.saveMatch('MOV123', 1, '2024-04-29 12:00');
+      await DatabaseServices.saveMatch('MOV123', '1', '2024-04-29 12:00');
       final matches = await DatabaseServices.displayMatches();
 
       expect(matches.length, greaterThan(0));
